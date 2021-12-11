@@ -1,6 +1,8 @@
 # Web_Community_Service_Project  
 sns like project ~2021-12-12  
 Node.js 교과서 Nodebird [https://github.com/ZeroCho/nodejs-book/tree/master/ch9].  
+--------------------------------------
+npm start
 -------------------------  
   
 you must set up ./config/config.json    
