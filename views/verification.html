@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="css/bootstrap.css" rel="stylesheet">
+    <title>{{title}}</title>
+    <style>
+        textarea {
+            resize: none;
+        }
+    </style>
+    {% block style %}
+    {% endblock %}
+</head>
+
+<body>
+    <div class="container">
+        <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+            <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-dark text-decoration-none">
+                <img class="bi me-2" width="28" height="28" fill="currentColor" src="icons/house-fill.svg">
+                <span class="fs-4">SSU_SNS</span>
+            </a>
+
+            <ul class="nav nav-pills">
+                {% if user and user.id %}
+                {% block menu %}
+                {% endblock %}
+                <input id="my-id" type="hidden" value="{{user.id}}">
+                <li class="nav-item mx-1"><a href="/auth/logout" class="nav-link"><img class="bi" width="28" height="28"
+                            fill="currentColor" src="icons/box-arrow-right.svg"></a></li>
+                {% else %}
+                <li class="nav-item mx-1">
+                    <button type="button" class="btn btn-outline-primary" onclick="location.href='/account' ">
+                        <span class="fs-5"> Join </span>
+                    </button>
+                </li>
+                <li class="nav-item mx-1">
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal"
+                        data-bs-target="#exampleModal">
+                        <img class="bi m-0 p-0" width="24" height="24" fill="currentColor"
+                            src="icons/box-arrow-in-left.svg">
+                        <span class="fs-5">Login</span>
+                    </button>
+                </li>
+                {% endif %}
+            </ul>
+        </header>
+    </div>
+
+
+    <div class="container">
+        <div class="form-group">
+            <form id="join-form" action="/post/verification/" method="post">
+                <h1 class="h3 mb-3 fw-normal">{{verifyuser.email}} : Email Verification</h1>
+
+                <div class="input-group d-flex my-2">
+                    <div class="form-floating">
+                        <input type="text" class="form-control " id="floatingCode" placeholder="michael jackson"
+                            name="code">
+                        <label for="floatingID">Verification Code</label>
+                    </div>
+                    <input id="verify-id" type="hidden" name="verifyid" value="{{verifyuser.id}}">
+                    <input id="verify-email" type="hidden" value="{{verifyuser.email}}">
+                    <button type="button" class="btn btn-secondary mx-2" id="codeCreate">Create Verification
+                        Code</button>
+                </div>
+                <button class="btn btn-lg btn-primary" type="submit">Verify</button>
+            </form>
+        </div>
+
+    </div>
+
+
+    <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <!-- Node.js를 위한 Promise API를 활용하는 HTTP 비동기 통신 라이브러리-->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+        window.onload = () => {
+            alert("이메일 인증을 진행해야 합니다.");
+        };
+    </script>
+    <script>
+        document.querySelectorAll('#codeCreate').forEach(function (tag) {
+            tag.addEventListener('click', function () {
+                const verifyId = document.querySelector('#verify-id').value;
+                const verifyEmail = document.querySelector('#verify-email').value;
+                alert(verifyEmail+"에 메일을 발송했습니다.");
+                if (verifyId) {
+                    axios.post(`/post/verification/${verifyId}`,
+                    {data: {
+                        verifyId: verifyId,
+                        verifyEmail: verifyEmail.toString()
+                    }})
+                        .then(() => {
+                        })
+                        .catch((err) => {
+                            console.error(err);
+                        });
+                }
+            });
+        });
+    </script>
+    {% block script %}
+    {% endblock %}
+</body>
+
+<div class="container">
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+        <div class="col-md-4 d-flex align-items-center">
+            <span class="text-muted">2021 SSU_SNS_Project</span>
+        </div>
+    </footer>
+</div>
+
+</html>

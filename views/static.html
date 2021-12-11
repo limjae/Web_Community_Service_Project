@@ -1,0 +1,228 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+{% if user and user.id %}
+<div class="container d-flex justify-content-between align-items-center">
+    <div>
+        <span class="fs-5 fw-bold p-auto">Posts</span>
+    </div>
+    <div>
+        <form action="/" method="GET" class="input-group">
+            <div class="input-group-text">
+                    <input class="form-check-input mx-2" type="radio" name="searchMode" id="flexRadioDefault1" value="id" checked>
+                    <label class="form-check-label" for="flexRadioDefault1">ID</label>
+                    <input class="form-check-input mx-2" type="radio" name="searchMode" id="flexRadioDefault2" value="text">
+                    <label class="form-check-label" for="flexRadioDefault2">Text</label>
+                    <input class="form-check-input mx-2" type="radio" name="searchMode" id="flexRadioDefault3" value="hash">
+                    <label class="form-check-label" for="flexRadioDefault3">HashTag</label>
+            </div>
+            <div class="input-group-text">
+                <span id="inputGroup-sizing-default">Search</span>
+            </div>
+            <input type="text" class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default" name="search">
+            <button type="submit" class="btn btn-secondary" id="msgSend">Send</button>
+        </form>
+    </div>
+</div>
+<div class="album py-5">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+            {% for twit in twits %}
+            <div class="col">
+                <div class="card shadow-sm">
+                    {% set filteredImgs = imgs|arrFilter('id',twit.id) %}
+                    {% if filteredImgs %}
+                    <div id="carouselStatic{{twit.id}}" class="carousel carousel-dark slide" data-bs-ride="carousel"
+                        data-bs-interval="false">
+                        {% if filteredImgs | length > 1%}
+                        <div class="carousel-indicators">
+                            {% for img in filteredImgs%}
+                            {% if img.image_id == 0 %}
+                            <button type="button" data-bs-target="#carouselStatic{{twit.id}}"
+                                data-bs-slide-to="{{img.image_id}}" class="active" aria-current="true"
+                                aria-label="Slide {{img.image_id}}"></button>
+                            {% else %}
+                            <button type="button" data-bs-target="#carouselStatic{{twit.id}}"
+                                data-bs-slide-to="{{img.image_id}}" aria-label="Slide {{img.image_id}}"></button>
+                            {% endif %}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        <div class="carousel-inner">
+                            {% for img in filteredImgs%}
+                            <input type="hidden" name="imgarray{{twit.id}}[]" value="{{img.img}}" />
+                            {% if loop.index0 == 0 %}
+                            <div class="carousel-item active">
+                                <img src="{{img.img}}" width="225" height="255" class="d-block w-100" alt="...">
+                            </div>
+                            {% else %}
+                            <div class="carousel-item">
+                                <img src="{{img.img}}" width="225" height="255" class="d-block w-100" alt="...">
+                            </div>
+                            {% endif %}
+                            {% endfor %}
+                            {% if filteredImgs | length == 0%}
+                            <div class="carousel-item active">
+                                <img src="/images/noimage.jpg" width="225" height="255" class="d-block w-100"
+                                    alt="NoImage">
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if filteredImgs | length > 1%}
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselStatic{{twit.id}}"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselStatic{{twit.id}}"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                        {% endif %}
+                    </div>
+                    <!-- <div class="twit-img"><img class="bi m-0 p-0 bd-placeholder-img card-img-top" width="225"
+                            height="225" fill="currentColor" src="{{twit.img}}" alt="섬네일"></div> -->
+                    {% else %}
+                    <img class="bi m-0 p-0 bd-placeholder-img card-img-top" width="225" height="225" fill="currentColor"
+                        src="icons/image.svg">
+                    {% endif %}
+                    <div class="card-body">
+                        <p class="card-text">
+                            {% set contentArr = twit|contentfilter %}
+                            {% for txt in contentArr %}
+                            {% if txt.isHash == true %}
+                            <a href="/?searchMode=hashstrict&search={{txt.letter}}">#{{txt.letter}}</a>
+                            {% else %}
+                            {{txt.letter}}
+                            {% endif %}
+                            {% endfor %}
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <input type="hidden" value="{{filteredImgs | length}}" class="twit-img-count">
+                                <input type="hidden" value="{{twit.User.id}}" class="twit-user-id following-user-id">
+                                <input type="hidden" value="{{twit.id}}" class="twit-id">
+                                <input type="hidden" value="{{twit.content}}" class="twit-content">
+                                
+                                {% if twit.User.id == user.id %}
+                                <button type="button" class="btn btn-sm btn-outline-secondary post-edit"
+                                    data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
+                                <button type="button"
+                                    class="btn btn-sm btn-outline-secondary post-delete">Delete</button>
+                                {% endif %}
+                                {% if twit.User.id !== user.id %}
+                                {% if twit.User.id in followingIdList%}
+                                <button type="button"
+                                    class="btn btn-sm btn-outline-secondary twit-unfollow">Unfollow</button>
+                                {% else %}
+                                <button type="button" class="btn btn-sm btn-outline-primary twit-follow">follow</button>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">{{twit.createdAt|date("DD MMM YYYY")}}<br><a
+                                    href="/?searchMode=idstrict&search={{twit.User.nick}}">{{twit.User.nick}}</a></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        {% for i in range(1, pagelimit+1) %}
+        {% if i == pagenum %}
+        <li class="page-item active"><a class="page-link" href="{{curhref}}pagenum={{i}}">{{i}}</a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="{{curhref}}pagenum={{i}}">{{i}}</a></li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</nav>
+
+{% else %}
+<div class="container text-center">
+    <div class="alert alert-primary" role="alert">
+        This is 2021-11-22 ~ SSU_SNS_Project
+    </div>
+    <div>
+        <img src="/images/ssu.jpg" class="img-fluid rounded-3" alt="SSU_LOGO" loading="lazy">
+    </div>
+</div>
+{% endif %}
+
+
+{% include 'NewEditModal.html' %}
+
+{% endblock %}
+
+{% block script %}
+{% include 'followUnfollow.html' %}
+<script>
+    window.onload = () => {
+        const msg = new URL(location.href).searchParams.get('loginError');
+        if (msg) {
+            alert(msg) ? "" : location.replace("/");
+        }
+    };
+
+    document.querySelectorAll('.post-edit').forEach(function (tag) {
+        tag.addEventListener('click', function () {
+            const myId = document.querySelector('#my-id');
+            const twitid = tag.parentNode.querySelector('.twit-id').value;
+            const twitContent = tag.parentNode.querySelector('.twit-content').value;
+            const imgs = document.getElementsByName(`imgarray${twitid}[]`);
+            const imgscount = tag.parentNode.querySelector('.twit-img-count').value;
+            
+            document.getElementById('editContent').innerHTML = twitContent;
+            document.getElementById('twit-edit-id').value = twitid;
+            document.getElementById(`existingImg`).innerHTML = ``;
+            for(let i=0 ; i<imgscount; ++i){
+                document.getElementById('existingImg').innerHTML += `<button type="button" class="btn p-0 edit-img-delete"><img src="${imgs[i].value}" heigh="225" width="225">
+                    <input type="hidden" name="imgeditarray[]" value="${imgs[i].value}" /></button>`;
+            }
+
+            document.querySelectorAll('.edit-img-delete').forEach(function (tag) {
+                tag.addEventListener('click', function () {
+                    this.parentNode.removeChild(this);
+                    alert(`delete existing image`);
+                });
+            });
+
+        });
+    });
+
+    
+
+    document.querySelectorAll('.post-delete').forEach(function (tag) {
+        tag.addEventListener('click', function () {
+            const myId = document.querySelector('#my-id');
+            if (myId) {
+                const userId = tag.parentNode.querySelector('.twit-user-id').value;
+                const twitid = tag.parentNode.querySelector('.twit-id').value;
+                if (userId == myId.value) {
+                    if (confirm('삭제 하시겠습니까?')) {
+                        axios.delete(`/post`, {
+                            data: {
+                                editid: twitid
+                            }
+                        })
+                            .then(() => {
+                                location.reload();
+                            })
+                            .catch((err) => {
+                                console.error(err);
+                            });
+                    }
+                }
+            }
+        });
+    });
+
+</script>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container mb-2">
+    <span class="fs-5">LoginID : {{user.nick}}<br></span>
+    <span class="fs-5">Name : {{user.name}}<br></span>
+    <span id="time" class="fs-5">현재 시간 :</span>
+</div>
+<div class="container">
+
+</div>
+<div class="container border p-3">
+    <div class="row row-cols-2 g-3 ">
+        <div class="followings half">
+            <span class="fs-5 fw-bold">Followings : {{followingCount}}</span>
+            {% if user.Followings %}
+            {% for following in user.Followings %}
+            <div class="container row justify-content-between mb-1">
+                <div class="col-4">
+                    <span class="fs-6">{{following.name}}({{following.nick}})</span>
+                </div>
+                <div class="col-4">
+                    <input type="hidden" value="{{following.id}}" class="following-user-id">
+                    <button type="button" class="btn btn-sm btn-outline-secondary twit-unfollow">Unfollow</button>
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="followings half">
+            <span class="fs-5 fw-bold">Followers : {{followerCount}}</span>
+            {% if user.Followers %}
+            {% for follower in user.Followers %}
+            <div class="container row justify-content-between mb-1">
+                <div class="col-4">
+                    <span class="fs-6">{{follower.name}}({{follower.nick}})</span>
+                </div>
+                {%if (user.Followings|arrFilter('id',follower.id))|length == 0 %}
+                <div class="col-4">
+                    <input type="hidden" value="{{follower.id}}" class="following-user-id">
+                    <button type="button" class="btn btn-sm btn-outline-primary twit-follow">Follow</button>
+                </div>
+                {%endif%}
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+    {% block script %}
+    {% include 'followUnfollow.html' %}
+    <script>
+        window.onload = function(){
+            let header = document.getElementById('time');
+            let originalHTML = header.innerHTML;
+            header.innerHTML = originalHTML + Date();
+            setInterval(() => { header.innerHTML = originalHTML + Date(); }, 1000);
+        };
+    </script>
+    {% endblock %}

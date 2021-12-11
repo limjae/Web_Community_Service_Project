@@ -1,0 +1,49 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="form-group">
+        <form id="join-form" action="/auth/account" method="post">
+            <h1 class="h3 mb-3 fw-normal">Please fill out the form</h1>
+
+            <div class="form-floating mb-3">
+                <input type="email" class="form-control" id="floatingEmail" placeholder="name@example.com" name="email" required>
+                <label for="floatingEmail">Email address</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="floatingName" placeholder="michael jackson" name="name" required>
+                <label for="floatingID">Name</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="floatingID" placeholder="nickname" name="nick" required>
+                <label for="floatingID">LoginID</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password" required>
+                <label for="floatingPassword">Password</label>
+            </div>
+
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Join</button>
+        </form>
+    </div>
+
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    window.onload = () => {
+        const errmsg = new URL(location.href).searchParams.get('error');
+        if (errmsg == 'emailExist') {
+            alert("이미 존재하는 이메일 주소 입니다.")?"":location.replace("/account");
+        }
+        else if(errmsg == 'nickExist'){
+            alert("이미 존재하는 닉네임 입니다.")?"":location.replace("/account");
+        }
+    };
+</script>
+{% endblock %}

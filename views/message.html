@@ -1,0 +1,112 @@
+{% extends 'layout.html' %}
+{% block style %}
+<style>
+    .fill-screen {
+        height: 70vh;
+    }
+</style>
+
+{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+
+        <div class="col-md-auto">
+            <div class="d-flex flex-column align-items-stretch flex-shrink-1 bg-white fill-screen"
+                style="width: 380px;">
+                <span class="d-flex align-items-center p-1 link-dark text-decoration-none border-bottom fs-5 fw-bold">
+                    User List</span>
+                <div class="list-group border-bottom scrollarea overflow-auto" id="messagescroll1">
+                    {%for f4fId in userlist %}
+                    <!-- <a href="#" class="list-group-item list-group-item-action py-3 lh-tight active" aria-current="true">
+                        <div class="d-flex w-100 align-items-center justify-content-between">
+                            <strong class="mb-1">{{f4fId.nick}}</strong>
+                            <small>Wed</small>
+                        </div>
+                        <div class="col-10 mb-1 small">Some placeholder content in a paragraph below the heading and
+                            date.
+                        </div>
+                    </a> -->
+                    <form action="/message" method="get" class="input-group" id="{{f4fId.usr.id}}get">
+                    <a onclick="document.getElementById('{{f4fId.usr.id}}get').submit();" class="list-group-item list-group-item-action py-3 lh-tight">
+                        <input type="hidden" value="{{f4fId.usr.id}}" name="selId">
+                        <div class="d-flex w-100 align-items-center justify-content-between">
+                            <strong class="mb-1">{{f4fId.usr.name}}({{f4fId.usr.nick}})</strong>
+                            <small class="text-muted mx-3">{{f4fId.time|date("hh:mm DD MMM YYYY")}}</small>
+                        </div>
+                    </a>
+                    </form>
+                    {%endfor%}
+                </div>
+            </div>
+        </div>
+
+        <div class="col">
+            <div class="d-flex flex-column align-items-stretch flex-shrink-1 bg-white fill-screen">
+                {% if selectId > 0 %}
+                {% for target in userlist %}
+                {%if target.usr.id == selectId %}
+                <span class="d-flex align-items-center p-1 link-dark text-decoration-none border-bottom fs-5 fw-bold">
+                    Messages With {{target.usr.name}}({{target.usr.nick}})</span>
+                {% endif%}
+                {% endfor %}
+                {% else %}
+                <span class="d-flex align-items-center p-1 link-dark text-decoration-none border-bottom fs-5 fw-bold">
+                    No Selected User</span>
+                {%endif%}
+                <div class="list-group border-bottom scrollarea overflow-auto mb-2" id="messagescroll2">
+                    {%for msg in msgs %}
+                    {%if (msg.senderId == user.id) and (msg.receiverId == selectId) %}
+                    <div class="list-group-item list-group-item-secondary py-2 lh-tight">
+                        <div class="d-flex w-100 align-items-center flex-row-reverse">
+                            <strong class="mb-1">{{msg.sender.name}}({{msg.sender.nick}})</strong>
+                            <small class="text-muted mx-3">{{msg.createdAt|date("hh:mm DD MMM YYYY")}}</small>
+                        </div>
+                        <div class="d-flex w-100 col-10 mb-1 small flex-row-reverse">{{msg.msg}}</div>
+                    </div>
+                    {%endif%}
+                    {%if (msg.receiverId == user.id) and (msg.senderId == selectId) %}
+                    <div class="list-group-item py-2 lh-tight">
+                        <div class="d-flex w-100 align-items-center">
+                            <strong class="mb-1">{{msg.sender.name}}({{msg.sender.nick}})</strong>
+                            <small class="text-muted mx-3">{{msg.createdAt|date("hh:mm DD MMM YYYY")}}</small>
+                        </div>
+                        <div class="d-flex w-100 col-10 mb-1 small">{{msg.msg}}</div>
+                    </div>
+                    {%endif%}
+                    {%endfor%}
+                </div>
+                {% if selectId > 0 %}
+                {% for target in userlist %}
+                {%if target.usr.id == selectId %}
+                <form action="/post/message" method="POST" class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Chat</span>
+                    </div>
+                    <input id="sender-id" type="hidden" value="{{user.id}}" name="sender">
+                    <input id="receiver-id" type="hidden" value="{{selectId}}" name="receiver">
+                    <input type="text" class="form-control " aria-label="Default"
+                        aria-describedby="inputGroup-sizing-default" name="msg">
+                    <button type="submit" class="btn btn-secondary" id="msgSend">Send</button>
+                </form>
+                {% endif%}
+                {% endfor %}
+                {% else %}
+                {%endif%}
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+{% endblock %}
+
+
+{% block script %}
+<script>
+    window.onload = () => {
+        document.getElementById('messagescroll2').scrollTop = 9999999;
+    };
+</script>
+{% endblock %}

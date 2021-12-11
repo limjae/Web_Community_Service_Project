@@ -1,0 +1,66 @@
+<!-- New Modal -->
+<div class="modal fade" id="newModal" tabindex="-1" aria-labelledby="newModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newModalLabel">New</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                <form class="container" id="twit-form" action="/post" method="post" enctype="multipart/form-data">
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control h-50" id="twit" name="content"></textarea>
+                        <label for="twit">Contents</label>
+                    </div>
+                    <div>추가되는 사진의 미리보기는 첫장만 지원합니다</div>
+                    <div class="img-preview mb-3">
+                        <img id="img-preview" src="" style="display: none;" width="250" alt="미리보기">
+                        <input id="img-url" type="hidden" name="url">
+                    </div>
+                    <div>
+                        <label id="img-label" for="img">사진 업로드</label>
+                        <input id="img" type="file" accept="image/*" multiple>
+                        <button id="twit-btn" type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Edit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="container" id="twit-form" action="/post?_method=PUT" method="post" enctype="multipart/form-data">
+                    <input type="hidden" value="" id="twit-edit-id" name="editid">
+                    <div class="form-floating mb-3">
+                        <textarea class="form-control h-50" id="editContent" name="content"></textarea>
+                        <label for="twit">Contents</label>
+                    </div>
+                    <div>기존 사진 클릭 시 삭제</div>
+                    <div id="existingImg" >
+                    </div>
+                    <div>추가되는 사진의 미리보기는 첫장만 지원합니다</div>
+                    <div class="img-preview mb-3">
+                        <img id="img-preview2" src="" style="display: none;" width="250" alt="미리보기">
+                        <input id="img-url2" type="hidden" name="url">
+                    </div>
+                    <div>
+                        <label id="img-label" for="editImg">사진 업로드</label>
+                        <input id="editImg" type="file" accept="image/*" multiple>
+                        <button id="twit-btn" type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
